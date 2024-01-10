@@ -5,6 +5,6 @@ I go to uvu
 My first coding class
 I will get an A in this class
 Summer is the best
-Superbowl
+I love dogs
 Worldcup
 Destiny >
