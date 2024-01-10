@@ -6,3 +6,4 @@ My first coding class
 I will get an A in this class
 Summer is the best
 Superbowl
+Worldcup
