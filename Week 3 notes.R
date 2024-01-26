@@ -1,0 +1,160 @@
+#Week 3 TUESDAY
+
+#1 build a data frame from mtcars with only rows that have  more than 4 cylinders (cyl)
+df <- mtcars[mtcars$cyl>4,]
+
+#2
+#pull out just the miles per gallon of those cars (mpg) and find the mean,min,max
+
+min(df$mpg)
+mean(df$mpg)
+max(df$mpg)
+
+
+
+# object types ####
+## logical 1 dimensions ####
+c(TRUE,TRUE,FALSE)
+## numeric 1d ####
+1:10
+## character 1d ####
+letters[1:3]
+## integer 1d ####
+c(1L,2L,3L)
+## data.frame 2 dimensions
+dff <- mtcars[mtcars$mpg>3,]
+## Factor ####
+as.factor(letters)
+haircolors <- c("brown","blonde","black","red", "red","black")
+c(as.factor(haircolors),"purple")
+as.character(as.factor(haircolors),"purple")
+haircolors
+
+
+# type conversion ####
+1:5 # numeric
+as.character(1:5) # convert to character
+as.numeric(letters)
+as.numeric(c("1","b","35"))
+as.logical(c("true","t","F","False"))
+x <- as.logical(c("true","t","F","False"))
+sum(x,na.rm = TRUE)
+
+
+# data frames ####
+str(mtcars)
+names(mtcars)
+
+# as.character(mtcars)
+as.character(mtcars$mpg)
+mtcars[,"mpg"]
+
+# for loop assigns numeric to character
+for (col  in names(mtcars)){
+  mtcars[,col] <- as.character(mtcars[,col])
+}
+
+apply(mtcars,2,as.logical) # use this instead of the for loop
+
+
+mtcars
+str(mtcars)
+data("mtcars") # reset built in data fram
+
+path <- "./Data/cleaned_bird_data.csv"
+df <- read.csv(path)
+str(df)
+
+for (birds in names(df) ){
+  df[,birds] <- as.character(df[,birds])
+
+}
+str(df)  
+
+
+# write the new file to your family
+write.csv(df,file = "./Data/cleaned_bird_data_chr.csv")
+
+# " apply" family functions ####
+apply(mtcars,2,as.logical)
+
+## packages ####
+library(tidyverse)
+#filter helps us subset data frames by rows
+mtcars %>% 
+  filter(mpg>19 & vs==1)
+  
+
+# "%>% " pipe # make sure you load library(tidyverse) to use the pipe function,control shift M
+# thing on the left becomes first argument to thing on the right
+mtcars$mpg %>% mean()
+
+
+
+# THURSDAY
+library(palmerpenguins)
+library(tidyverse)
+penguins %>% names
+
+# subset this penguins data frame to only have those observations where  bill_length_mm>40
+df <- penguins[penguins$bill_length_mm>40,]
+df
+#or use this, use the & to add more specifics
+x <- penguins %>% 
+    filter(bill_length_mm>40 & sex=="female") 
+x$body_mass_g %>% mean 
+
+#this also works , find mean body mass of female long beaked penguins
+penguins %>% 
+  filter(bill_length_mm>40 & sex=="female") %>% 
+  pluck("body_mass_g") %>% 
+  mean
+
+#do the same but for each species
+penguins %>% 
+  filter(bill_length_mm>40 & sex=="female") %>% 
+  group_by(species,island) %>% # commas to separate all grouping columns
+  summarize(mean_body_mass=mean(body_mass_g),
+            min_body_mass=min(body_mass_g),
+            max_body_mass=max(body_mass_g),
+            sd_body_mass=sd(body_mass_g),
+            N=n()) %>% 
+  arrange(desc(mean_body_mass)) %>% 
+  write_csv("./Data/penguins_summary.csv")
+
+
+# find the fatties penguins ( body_mass>5000)
+#count how many are male and how many are female
+# return the max body mass for males and females
+#bonus : add new column to penguins that says whether they re a fattie
+
+penguins %>% 
+  filter(body_mass_g>5000) %>% 
+  group_by(sex) %>% 
+  summarize(N=n(),# N is how to count
+            max_body_mass=max(body_mass_g))
+
+penguins %>% 
+  mutate(fatties=body_mass_g>5000) # for changing and adding new columns
+
+
+#or to put the word fatty instead of true or false
+x <- 
+penguins %>% 
+  mutate(fatstack=case_when(body_mass_g>5000~"fattie",
+                            body_mass_g<= 5000 ~"skinny"))
+
+x %>% 
+  filter(!is.na(sex)) %>% 
+  ggplot(mapping = aes(x=body_mass_g,
+                       y=bill_length_mm,
+                       color=fatstack,
+                       shape=fatstack))+
+  geom_point()+
+  geom_smooth()+
+  #scale_color_viridis_d(option = 'plasma',end=.8)+
+  scale_color_manual(values = c("violet","turquoise"))+
+  theme_dark()+
+  theme(axis.text = element_text(angle=180,face='italic'))
+  
+
