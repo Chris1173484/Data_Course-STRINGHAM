@@ -157,4 +157,24 @@ x %>%
   theme_dark()+
   theme(axis.text = element_text(angle=180,face='italic'))
   
+# WEEK 4 TUESDAY , continued 
+#these are called global aesthetics
+names(penguins)
+ggplot(penguins,mapping = aes(x = flipper_length_mm,
+                              y=body_mass_g,color=species,alpha=bill_depth_mm))+
+  
+  # geom_col()
+  #this is for specific aesthetics, each geom is covering up the last layer ,so order correctly
+  geom_path(aes(group=species))+
+  stat_ellipse()+
+  geom_point(aes(color=sex))+
+  geom_polygon()+
+  geom_hex()+
+  geom_bin2d()+
+  geom_boxplot()+
+  geom_hline(yintercept=4500,linewidth=25,color='magenta',
+             linetype='1121',alpha=.25)+
+  geom_point(color='yellow',aes(alpha=bill_depth_mm))+
+  theme(axis.title=element_text(face = 'italic',size=12,angle=30),
+        legend.background = element_rect(fill='hotpink',color='blue',linewidth = 5))
 

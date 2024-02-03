@@ -151,7 +151,7 @@ dbinom(50,100,.5) # probability of getting exactly 50 heads out of 100 coin flip
 # YOUR REMAINING HOMEWORK ASSIGNMENT (Fill in with code) ####
 
 # 1.  Get a subset of the "iris" data frame where it's just even-numbered rows
-
+library(tidyverse)
 seq(2,150,2) # here's the code to get a list of the even numbers between 2 and 150
 even_iris <- seq(2,150,2)
 even_iris2 <- iris[even_iris,]
