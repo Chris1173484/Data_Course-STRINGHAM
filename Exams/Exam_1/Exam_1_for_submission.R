@@ -1,6 +1,6 @@
 # **I.**
 #   **Read the cleaned_covid_data.csv file into an R data frame. (20 pts)**
-df <- read.csv("C:/Users/cstri/DataClass/Data_course_STRINGHAM/Exams/Exam_1/cleaned_covid_data.csv")
+df <- read.csv("cleaned_covid_data.csv")
 df
 
 #   **II.**
