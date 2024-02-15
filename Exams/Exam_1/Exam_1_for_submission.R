@@ -1,13 +1,14 @@
 # **I.**
 #   **Read the cleaned_covid_data.csv file into an R data frame. (20 pts)**
-df <- read.csv("cleaned_covid_data.csv")
+library(tidyverse)
+df <- read_csv("./cleaned_covid_data.csv")
 df
 
 #   **II.**
 #   **Subset the data set to just show states that begin with "A" and save this as an object called A_states. (20 pts)**
-library(tidyverse)
 A_states <- subset(df,grepl("^A",df$Province_State))
 A_states
+
 
 #   + Use the *tidyverse* suite of packages
 # + Selecting rows where the state starts with "A" is tricky (you can use the grepl() function or just a vector of those states if you prefer)
@@ -71,3 +72,5 @@ ggplot(New_df,aes(x=reorder(Province_State,-Maximum_Fatality_Ratio),
 
 
 #  + You'll need to read ahead a bit and use the dplyr package functions group_by() and summarize() to accomplish this.
+
+list.files(Exam_1)
