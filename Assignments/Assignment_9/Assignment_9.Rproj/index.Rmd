@@ -1,0 +1,142 @@
+---
+title: "Assignment 9 Markdown"
+output: 
+  html_document: 
+    theme: sandstone
+date: "2024-03-26"
+
+---
+```{r,include=FALSE}
+library(tidyverse)
+library(modelr)
+library(easystats)
+library(GGally)
+library(ggpubr)
+library(knitr)
+library(rmarkdown)
+```
+
+
+##### Read in data 
+```{r,warning=FALSE}
+dat <- read_csv("GradSchool_Admissions.csv")
+```
+
+##### A quick look at the data
+```{r}
+glimpse(dat)
+```
+
+```{r}
+dat %>% 
+  select(gre,gpa,admit,rank) %>% 
+  ggpairs()
+```
+
+
+# Data Exploration
+##### Here we are looking at what the trend could be Comparing GRE,GPA, Rank, and Admit
+##### Rank 1-4, 1 meaning the best. And Admit with 1 being accepted ,0 not.
+```{r}
+
+# Gre and GPA Visualization
+fig_1 <- dat %>% 
+  ggplot(aes(x=gre,y=gpa))+
+  geom_point()+
+  facet_grid(admit~rank)+
+  theme_minimal()
+```
+
+# Testing Theoreticals
+##### We can see from theoretical sampples and our original samples there is a trend
+```{r}
+ggpubr::ggqqplot(dat$gre)
+```
+
+# The making of models
+##### Running some code to determine the best model
+```{r}
+mod1 <- glm(data = dat, formula = gre ~ gpa + admit)
+mod2 <- glm(data = dat, formula = gre ~ gpa * admit)
+mod3 <- glm(data = dat, formula = gre ~ admit * rank)
+full_mod <- glm(data = dat, formula = gre ~ gpa * admit * rank)
+
+```
+
+# Model Comparison
+##### Here we want to look at values showing how good each model is 
+```{r}
+# Model Comparison
+step <- MASS::stepAIC(full_mod, trace = 0)
+mod4 <- glm(data = dat, formula = step$formula)
+
+# Model Performance Comparison
+comps <- compare_performance(mod1, mod2, mod3, rank = TRUE)
+
+comps
+```
+
+# Models
+##### When looking at this, mod2 seems to be showing best fit
+```{r}
+comps %>% plot()
+```
+
+# Predictions
+##### lets graph the predictions and see what comes out
+```{r,warning=FALSE}
+# Predictions Visualization
+# so we can tell these are not sitting well with the trend at all
+fig_2 <- dat %>% 
+  gather_predictions(mod1, mod2, mod3) %>% 
+  ggplot(aes(x = gre, y = pred, color = model)) +
+  geom_segment(aes(x = 0, y = 0, xend = 800, yend = 650), linetype = 2, color = "black", alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_wrap(~rank) +
+  theme_minimal() +
+  scale_color_viridis_d() +
+  labs(title = "Predictions vs Observations", subtitle = "Dashed line indicates perfect overlap between observed values and predictions")
+fig_2
+
+
+```
+# Re-training models
+##### Since its doing a great job , we want to do a cross validation to see how it works when it doesnt have the entire data set
+```{r}
+# Data Partitioning
+set.seed(123)
+training_samples <- caret::createDataPartition(seq_along(dat$gre), p = 0.8)
+train_data <- dat[training_samples$Resample1, ]
+test_data <- dat[-training_samples$Resample1, ]
+
+# Rebuilding Models on Training Data
+mod2_formula <- mod2$formula
+mod1_formula <- mod1$formula
+
+mod2 <- glm(data = train_data, formula = mod2_formula)
+mod1 <- glm(data = train_data, formula = mod1_formula)
+```
+
+# Replot
+##### As you can tell this didnt do much, its basically the exact same from a quick glance
+```{r}
+# Predictions on Test Data
+fig_3 <- gather_predictions(test_data, mod2, mod1) %>% 
+  ggplot(aes(x = gre, y = pred, color = model)) +
+  geom_segment(aes(x = 0, y = 0, xend = 800, yend = 650), linetype = 2, color = "black", alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_wrap(~rank) +
+  theme_minimal() +
+  scale_color_viridis_d() +
+  labs(title = "Predictions vs Observations", subtitle = "Dashed line indicates perfect overlap between observed values and predictions")
+fig_3
+```
+
+
+# Model Parameters
+##### Values showing Essential Values
+```{r}
+mod2 %>% model_parameters()
+```
+#### Something to mind would be , yes GRE and GPA are great variables to look at when evaluating the chances of someone getting accepted. OThers things like school rank , geographical location, race , and sex can be inputed too to see the chances.
+
