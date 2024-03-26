@@ -32,10 +32,10 @@ data <- data %>%
 
 #3 Generates a plot that matches this one (note just plotting dilution == 0.1)
 df<- data[data$dilution==0.1,]# getting only the data that has 0.1 dilution
-df$hour <- as.numeric(df$hour)# change charcter to numeric
+df$hour <- as.numeric(df$hour)# change character to numeric
 
 ggplot(df,aes(x =hour, y =value,color=Type)) +
-  geom_smooth(method="loess",se=FALSE)+ # () means getting rid of gray backgroun
+  geom_smooth(method="loess",se=FALSE)+ # () means getting rid of gray background
   facet_wrap(~ substrate)+# Separate plots for each substrate
   labs(
     title = "Just dilution 0.1",
